@@ -56,4 +56,26 @@ class VuforiaApi {
         }
         println(response.bodyAsText())
     }
+
+    suspend fun getTargetById(targetId: String, serverAccessKey: String, serverSecretKey: String) {
+        val client = HttpClient(CIO)
+        val response: HttpResponse = client.get(BASE_URL + "/targets/$targetId") {
+            headers.clear();
+            headers {
+                append(HttpHeaders.Date, DateUtils.formatDate(Date()))
+                append(
+                    HttpHeaders.Authorization,
+                    "VWS $serverAccessKey:" + generateSignature(
+                        "/targets/$targetId",
+                        "GET",
+                        "",
+                        "",
+                        get(HttpHeaders.Date)!!,
+                        serverSecretKey
+                    )
+                )
+            }
+        }
+        println(response.bodyAsText())
+    }
 }
