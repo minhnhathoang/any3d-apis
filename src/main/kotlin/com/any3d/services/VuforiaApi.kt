@@ -78,4 +78,31 @@ class VuforiaApi {
         }
         println(response.bodyAsText())
     }
+
+    suspend fun addTarget(
+        targetName: String,
+        image: ByteArray,
+        serverAccessKey: String,
+        serverSecretKey: String
+    ) {
+        val client = HttpClient(CIO)
+        val response: HttpResponse = client.post(BASE_URL + "/targets") {
+            headers.clear();
+            headers {
+                append(HttpHeaders.Date, DateUtils.formatDate(Date()))
+                append(
+                    HttpHeaders.Authorization,
+                    "VWS $serverAccessKey:" + generateSignature(
+                        "/targets",
+                        "POST",
+                        image.toString(Charsets.UTF_8),
+                        "application/json",
+                        get(HttpHeaders.Date)!!,
+                        serverSecretKey
+                    )
+                )
+            }
+        }
+        println(response.bodyAsText())
+    }
 }
